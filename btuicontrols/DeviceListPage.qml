@@ -120,7 +120,7 @@ Page {
             db.executeWithParams('SELECT * FROM devices WHERE uuid = ?;', [uuid], (result) => {
                 if (result.rows.length === 0) {
                     db.executeWithParams('INSERT INTO devices (name, address, uuid) VALUES (?, ?, ?);', [name, address, uuid]);
-                    listModel.append({name: name, address: address, isOnline: true});
+                    listModel.append({name: name, address: address, isOnline: true, uuid: uuid});
                 } else {
                     let uuid = result.rows[0].uuid;
                     for (let i = 0; i < listModel.count; i++){

@@ -42,12 +42,14 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 int main(int argc, char *argv[]) {
 
     QGuiApplication app(argc, argv);
+    app.setOrganizationName("zaval");
+
     const auto p = std::filesystem::path(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation).toStdString()) / "logs";
     auto d = QDir(p);
     if (!d.exists()){
         d.mkpath("."_L1);
     }
-    logPath = p / "log.txt";
+    logPath = (p / "log.txt").string();
     qSetMessagePattern("[%{time yyyy.MM.dd hh:mm:ss}] %{message}");
     originalHandler = qInstallMessageHandler(logToFile);
     qDebug() << "-------------------START-------------------";

@@ -4,6 +4,7 @@ set_source_files_properties(UiHelper.qml PROPERTIES
 
 qt_add_qml_module(
         btuicontrols
+        STATIC
         URI btuicontrols
         VERSION 1.0
         QML_FILES

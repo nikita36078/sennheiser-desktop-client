@@ -28,7 +28,7 @@ add_custom_command(
         VERBATIM
 )
 
-qt_add_library(gaiaV3
+qt_add_library(gaiaV3 STATIC
         GAIAPropertyBase.cpp
         GAIAPropertyBase.h
         ${GAIAPropertyClasses_SRC}

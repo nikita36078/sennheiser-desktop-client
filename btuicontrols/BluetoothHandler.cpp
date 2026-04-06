@@ -5,7 +5,7 @@
 BluetoothHandler::BluetoothHandler(QObject *parent) :
     QObject(parent),
     discoveryAgent(new QBluetoothDeviceDiscoveryAgent(this)),
-    serviceUuid(QStringLiteral("0000fdce-0000-1000-8000-00805f9b34fb")),
+    serviceUuid(QStringLiteral("a2129ff3-081b-4c45-8afe-469d9c4842ec")),
     m_isSearching(false)
 //#ifdef Q_OS_APPLE
 //    , serviceInfos{}
@@ -20,7 +20,7 @@ void BluetoothHandler::startDeviceDiscovery() {
 //    qDebug() << "Start discovery";
     m_isSearching = true;
     Q_EMIT isSearchingChanged();
-    discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::LowEnergyMethod);
+    discoveryAgent->start(QBluetoothDeviceDiscoveryAgent::ClassicMethod);
 //#ifdef Q_OS_APPLE
 //    serviceInfos.clear();
 //#endif

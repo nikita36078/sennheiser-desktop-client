@@ -6,8 +6,6 @@ import gaiaV3
 import QtCore
 import QtQuick.Layouts
 
-import QtQuick
-
 ApplicationWindow {
     id: mainWindow
     width: 1000

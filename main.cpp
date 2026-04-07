@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <QDir>
 #include <QSettings>
+#include <QQuickStyle>
+#include <QOperatingSystemVersion>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -53,6 +55,18 @@ int main(int argc, char *argv[]) {
     qSetMessagePattern("[%{time yyyy.MM.dd hh:mm:ss}] %{message}");
     originalHandler = qInstallMessageHandler(logToFile);
     qDebug() << "-------------------START-------------------";
+
+    auto qmlStyle = QStringLiteral("Fusion");
+
+#if defined Q_OS_MACOS
+    qmlStyle = QStringLiteral("macOS");
+#elif defined Q_OS_WIN and QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    if (const auto osVersion = QOperatingSystemVersion::current().version(); osVersion > QOperatingSystemVersion::Windows11.version()) {
+        qmlStyle = QStringLiteral("FluentWinUI3");
+    }
+#endif
+
+    QQuickStyle::setStyle(qmlStyle);
 
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(

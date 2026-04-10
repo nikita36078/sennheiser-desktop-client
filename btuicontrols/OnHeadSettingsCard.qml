@@ -7,7 +7,7 @@ import Qt5Compat.GraphicalEffects
 Rectangle {
     id: root
     width: 400
-    height: 150
+    height: 160
     radius: 20
     border.color: root.palette.mid
     clip: true

@@ -29,13 +29,16 @@ value_types = {
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Process input and output files.")
-    parser.add_argument('-i', '--input', type=str, required=True, help='Input file path')
+    parser.add_argument('-i', '--input', type=str, nargs='+', required=True, help='Input file path')
     parser.add_argument('-o', '--output', type=str, required=True, help='Output file path')
 
     args = parser.parse_args()
 
-    with open(args.input, 'r') as f:
-        data = json.load(f)
+    data_properties = []
+    for input_file in args.input:
+        with open(input_file, 'r') as f:
+            data = json.load(f)
+            data_properties += data["properties"]
 
     with (open(f"{args.output}.h", 'w') as h_file,
           open(f"{args.output}.cpp", 'w') as cpp_file):
@@ -43,7 +46,7 @@ if __name__ == "__main__":
         h_file.write(H_HEADER)
         cpp_file.write(CPP_HEADEAR)
 
-        for property_object in data["properties"]:
+        for property_object in data_properties:
 
             if ("Get" not in property_object
                     and "Set" not in property_object

@@ -27,6 +27,8 @@ public:
         UINT8,
         UINT16,
         UINT32,
+        INT8,
+        INT16,
         STRING,
         BOOL,
         NONE

@@ -48,14 +48,17 @@ GAIAPropertyBase *GAIAPropertyManager::getPropertyFromVendorCommand(const quint1
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Process input and output files.")
-    parser.add_argument('-i', '--input', type=str, required=True, help='Input file path')
+    parser.add_argument('-i', '--input', type=str, nargs='+', required=True, help='Input file path')
     parser.add_argument('-o', '--output', type=str, required=True, help='Output file path')
 
     args = parser.parse_args()
     # print(f"Processing schema {args.input} into {args.output}.{{h,cpp}}")
 
-    with open(args.input, 'r') as f:
-        data = json.load(f)
+    data_properties = []
+    for input_file in args.input:
+        with open(input_file, 'r') as f:
+            data = json.load(f)
+            data_properties += data["properties"]
 
     get_property_code = []
     properties = []
@@ -67,7 +70,7 @@ if __name__ == "__main__":
     with (open(f"{args.output}.h", 'w') as h_file,
           open(f"{args.output}.cpp", 'w') as cpp_file):
 
-        for property_object in data["properties"]:
+        for property_object in data_properties:
             get_key = None
             if ("Get" not in property_object
                     and "Set" not in property_object

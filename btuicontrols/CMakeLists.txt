@@ -17,6 +17,7 @@ qt_add_qml_module(
             UiHelper.qml
             CallSettingsCard.qml
             OnHeadSettingsCard.qml
+            SoundCard.qml
             SettingsDialog.qml
             AboutDialog.qml
             DatabaseStorage.qml
@@ -33,6 +34,8 @@ qt_add_qml_module(
             OnHeadSettingsCardHelper.h
             CallSettingsCardHelper.cpp
             CallSettingsCardHelper.h
+            SoundCardHelper.cpp
+            SoundCardHelper.h
 
 )
 

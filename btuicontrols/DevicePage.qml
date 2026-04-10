@@ -23,11 +23,11 @@ Page {
                 spacing: 10
                 DeviceInfoCard{}
                 OnHeadSettingsCard{}
-                // SettingsCard{}
 
             }
             ANCCard2{}
             ConnectedDevicesCard{}
             CallSettingsCard{}
+            SoundCard{}
         }
 }

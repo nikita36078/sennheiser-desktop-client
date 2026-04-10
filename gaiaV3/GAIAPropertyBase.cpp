@@ -7,6 +7,8 @@ using namespace Qt::Literals::StringLiterals;
         {ParameterType::UINT32, 4},
         {ParameterType::UINT16, 2},
         {ParameterType::UINT8, 1},
+        {ParameterType::INT16, 2},
+        {ParameterType::INT8, 1},
         {ParameterType::STRING, -1},
         {ParameterType::BOOL, 1},
 };
@@ -15,7 +17,21 @@ GAIAPropertyBase::GAIAPropertyBase(QObject *parent) : QObject(parent) {}
 
 QByteArray GAIAPropertyBase::prepareCommand(CommandType type, const QVariantList &parameters) const {
     auto res = "\xff\x03"_ba; // header
-    const auto paramSize = static_cast<uint16_t>(parameters.length());
+    auto paramSize = 0;
+
+    for (const auto & cur_param: parameters){
+        switch (type) {
+            case CommandType::SET:
+                paramSize += typeSizes[setTypes[0]];
+                break;
+            case CommandType::INVOCATION:
+                paramSize += typeSizes[parameterTypes[0]];
+                break;
+            default:
+                paramSize += 1;
+                break;
+        }
+    }
 
     // length
     res.append(static_cast<char>((paramSize & 0xff00) >> 8));
@@ -83,7 +99,7 @@ QByteArray GAIAPropertyBase::prepareCommand(CommandType type, const QVariantList
             continue;
         }
 
-        switch (param.typeId()) {
+        /*switch (param.typeId()) {
             case QMetaType::Type::Char:
             case QMetaType::Type::UChar:
             case QMetaType::Type::QChar:
@@ -115,7 +131,7 @@ QByteArray GAIAPropertyBase::prepareCommand(CommandType type, const QVariantList
                 break;
             default:
                 break;
-        }
+        }*/
     }
 
     return res;

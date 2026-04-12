@@ -1,0 +1,101 @@
+name: Release artifacts
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macos-universal
+            runner: macos-latest
+            qt-host: mac
+            qt-arch: clang_64
+            package-extension: dmg
+          - name: linux-x64
+            runner: ubuntu-latest
+            qt-host: linux
+            qt-arch: linux_gcc_64
+            package-extension: deb
+          - name: windows-x64
+            runner: windows-latest
+            qt-host: windows
+            qt-arch: win64_msvc2022_64
+            package-extension: zip
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full cmake libicu-dev
+
+      - name: Set up Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.0'
+          host: ${{ matrix.qt-host }}
+          target: desktop
+          arch: ${{ matrix.qt-arch }}
+          modules: qtconnectivity
+          dir: ${{ github.workspace }}/qt
+          cache: true
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Package
+        run: cpack --config build/CPackConfig.cmake -B build -C Release
+
+      - name: Stage release asset
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          PACKAGE_EXTENSION: ${{ matrix.package-extension }}
+          PLATFORM_NAME: ${{ matrix.name }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          package_file="$(find build -maxdepth 1 -type f -name "*.${PACKAGE_EXTENSION}" | head -n 1)"
+          if [[ -z "${package_file}" ]]; then
+            echo "No .${PACKAGE_EXTENSION} package produced by CPack" >&2
+            exit 1
+          fi
+          asset_name="sennheiser-client-${RELEASE_TAG}-${PLATFORM_NAME}.${PACKAGE_EXTENSION}"
+          cp "${package_file}" "dist/${asset_name}"
+
+      - name: Upload staged asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.name }}
+          path: dist/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish release assets
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download staged assets
+        uses: actions/download-artifact@v8.0.1
+        with:
+          pattern: release-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Upload assets to existing release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "${RELEASE_TAG}" release-assets/* --clobber --repo "${{ github.repository }}"
